@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Récapitulatif des Veilles Technologiques</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --accent-color: #e74c3c;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --category-header: #ecf0f1;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+        
+        header {
+            background-color: var(--secondary-color);
+            color: white;
+            text-align: center;
+            padding: 2rem 1rem;
+            position: relative;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            margin-top: 0.5rem;
+        }
+        
+        .search-container {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+        }
+        
+        #search {
+            padding: 10px 15px;
+            width: 100%;
+            max-width: 500px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            font-size: 1rem;
+        }
+        
+        .categories-filter {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 20px 0;
+            justify-content: center;
+        }
+        
+        .category-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .category-btn:hover {
+            background-color: #2980b9;
+        }
+        
+        .category-btn.active {
+            background-color: var(--accent-color);
+        }
+        
+        .category-section {
+            margin-bottom: 40px;
+        }
+        
+        .category-header {
+            background-color: var(--category-header);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .category-title {
+            margin: 0;
+            color: var(--secondary-color);
+            font-size: 1.5rem;
+        }
+        
+        .category-count {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+        
+        .veilles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .veille-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .veille-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-content {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .veille-title {
+            font-size: 1.2rem;
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: var(--secondary-color);
+        }
+        
+        .veille-description {
+            margin-bottom: 10px;
+            flex-grow: 1;
+        }
+        
+        .veille-summary {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-size: 0.9rem;
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        .veille-link {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            margin-top: 10px;
+            transition: background-color 0.3s ease;
+            text-align: center;
+        }
+        
+        .veille-link:hover {
+            background-color: #2980b9;
+        }
+        
+        footer {
+            background-color: var(--secondary-color);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .veilles-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            header {
+                padding: 1rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Récapitulatif des Veilles Technologiques</h1>
+            <p class="subtitle">Une collection organisée de toutes vos recherches et analyses techniques</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="search-container">
+            <input type="text" id="search" placeholder="Rechercher une veille..." onkeyup="filterVeilles()">
+        </div>
+
+        <div class="categories-filter">
+            <button class="category-btn active" onclick="filterCategory('all')">Tous</button>
+            <button class="category-btn" onclick="filterCategory('frontend')">Frontend</button>
+            <button class="category-btn" onclick="filterCategory('libraries')">Bibliothèques</button>
+            <button class="category-btn" onclick="filterCategory('frameworks')">Frameworks</button>
+            <button class="category-btn" onclick="filterCategory('api')">API</button>
+            <button class="category-btn" onclick="filterCategory('ai')">IA</button>
+            <button class="category-btn" onclick="filterCategory('tools')">Outils</button>
+            <button class="category-btn" onclick="filterCategory('tech')">Technologies</button>
+        </div>
+
+        <div id="veilles-container">
+            <!-- Les sections par catégorie seront générées dynamiquement par JavaScript -->
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Récapitulatif des Veilles Technologiques</p>
+        </div>
+    </footer>
+
+    <script>
+        // Données des veilles
+        const veilles = [
+            {
+                title: "Les bases en HTML et CSS",
+                category: "tech",
+                description: "Présentation générale des technologies surveillées par le Groupe E",
+                summary: "Ce document présente un aperçu global des technologies surveillées par le Groupe E, incluant les méthodologies de veille, les domaines d'intérêt principaux, et les résultats obtenus. Il sert de point d'entrée pour comprendre l'ensemble des travaux de veille technologique.",
+                url: "https://wawawil.github.io/Veille-Technologique-Groupe-E/"
+            },
+            {
+                title: "Veille API",
+                category: "api",
+                description: "Analyse et présentation des API pour le développement web",
+                summary: "Cette veille explore les différentes API disponibles pour le développement web moderne, leurs utilisations, avantages et inconvénients. Elle couvre les API RESTful, GraphQL, et les meilleures pratiques pour l'intégration d'API dans les projets web.",
+                url: "https://faidinan.github.io/veille-api-groupe-E/"
+            },
+            {
+                title: "IA Générative",
+                category: "ai",
+                description: "Exploration des technologies d'intelligence artificielle générative",
+                summary: "Cette veille examine les avancées récentes dans le domaine de l'IA générative, y compris les modèles de langage comme GPT, les générateurs d'images comme DALL-E et Midjourney, ainsi que leurs applications pratiques dans différents secteurs.",
+                url: "https://kyl226.github.io/veille-IA-G-n-rative/"
+            },
+            {
+                title: "Bibliothèques JavaScript",
+                category: "libraries",
+                description: "Présentation des bibliothèques JavaScript populaires et émergentes",
+                summary: "Un tour d'horizon des bibliothèques JavaScript les plus utilisées et les plus prometteuses. Cette veille analyse leurs caractéristiques, cas d'usage et performance, aidant les développeurs à choisir les outils adaptés à leurs projets.",
+                url: "https://abb-gg.github.io/veille-sur-les-biblioth-ques-js/"
+            },
+            {
+                title: "Frontend Technologies",
+                category: "frontend",
+                description: "Dernières tendances et technologies dans le développement frontend",
+                summary: "Cette veille présente les technologies frontend les plus récentes, incluant les frameworks, outils de build, approches de design, et méthodologies pour créer des interfaces utilisateur modernes, performantes et accessibles.",
+                url: "https://abb-gg.github.io/Veille-Tech-frontend/"
+            },
+            
+            {
+                title: "Veille sur les Maquettes",
+                category: "tools",
+                description: "Exploration des outils et techniques de maquettage",
+                summary: "Cette veille analyse les différents outils de maquettage (wireframing et prototypage) disponibles pour les designers et développeurs. Elle compare leurs fonctionnalités, leur facilité d'utilisation et leur intégration dans le workflow de développement.",
+                url: "https://abb-gg.github.io/Veille-maquettes-/"
+            },
+            {
+                title: "Veille sur la sécurité",
+                category: "tech",
+                description: "Surveillance des systèmes d'information web",
+                summary: "Analyse des systèmes d'information web modernes, leur architecture, sécurité et évolution. Cette veille couvre les bonnes pratiques pour concevoir, déployer et maintenir des systèmes d'information robustes et évolutifs.",
+                url: "https://abb-gg.github.io/Veille-siweb/"
+            },
+            {
+                title: "Veille HYIP",
+                category: "tech",
+                description: "Analyse des High Yield Investment Programs",
+                summary: "Cette veille explore le concept de HYIP (High Yield Investment Programs), leurs caractéristiques, risques associés et impact sur l'écosystème financier en ligne. Elle inclut également des analyses de cas et des considérations éthiques.",
+                url: "https://abb-gg.github.io/veille-hyip/"
+            },
+            {
+                title: "Veille IPTV",
+                category: "tech",
+                description: "Exploration des technologies de télévision par protocole Internet",
+                summary: "Cette veille examine les technologies IPTV, leur fonctionnement, infrastructures nécessaires, et tendances actuelles. Elle couvre également les aspects légaux, les modèles économiques et l'avenir de la télévision distribuée via Internet.",
+                url: "https://wawawil.github.io/Veille-IPTV/"
+            },
+            {
+                title: "Chart.js",
+                category: "libraries",
+                description: "Utilisation de la bibliothèque Chart.js pour la visualisation de données",
+                summary: "Guide détaillé sur l'utilisation de Chart.js pour créer des visualisations de données interactives. Cette veille présente les différents types de graphiques disponibles, les techniques d'animation, et les meilleures pratiques pour représenter efficacement les données.",
+                url: "https://abb-gg.github.io/veille-chartjs/"
+            },
+            {
+                title: "Hébergeurs Web",
+                category: "tools",
+                description: "Comparaison et analyse des solutions d'hébergement web",
+                summary: "Cette veille compare les différentes solutions d'hébergement web disponibles sur le marché, analysant leur performance, fiabilité, sécurité, tarification et support. Elle aide à choisir l'hébergeur adapté selon le type de projet et les besoins spécifiques.",
+                url: "https://abb-gg.github.io/veille-h-bergeurs-/"
+            },
+            {
+                title: "Agora.io",
+                category: "api",
+                description: "Exploration de la plateforme Agora.io pour les appels vidéo et audio",
+                summary: "Analyse approfondie d'Agora.io, une plateforme de communication en temps réel. Cette veille explore les fonctionnalités de l'API, son intégration dans les applications web et mobiles, ainsi que ses cas d'utilisation pour les appels vidéo et audio.",
+                url: "https://wawawil.github.io/Agora.io/"
+            },
+            {
+                title: "WebRTC",
+                category: "tech",
+                description: "Communication en temps réel avec WebRTC",
+                summary: "Cette veille explore la technologie WebRTC (Web Real-Time Communication), ses composants, son fonctionnement et ses applications. Elle couvre également les défis de déploiement, les considérations de sécurité et les exemples d'implémentation.",
+                url: "https://le-webrtc.onrender.com/"
+            },
+            {
+                title: "Réalité Augmentée",
+                category: "tech",
+                description: "Technologies et applications de la réalité augmentée",
+                summary: "Exploration des technologies de réalité augmentée, leurs fondements techniques, outils de développement et applications dans divers secteurs. Cette veille analyse également les tendances futures et l'impact potentiel sur l'interaction homme-machine.",
+                url: "https://estherbro123.github.io/augmented-real/"
+            },
+            {
+                title: "Blockchain",
+                category: "tech",
+                description: "Fondamentaux et applications de la technologie blockchain",
+                summary: "Cette veille présente les principes fondamentaux de la blockchain, son fonctionnement, et ses applications au-delà des cryptomonnaies. Elle explore les smart contracts, les différents types de blockchain, et leur impact potentiel sur diverses industries.",
+                url: "https://sarahakl.github.io/Blockchain/"
+            },
+            {
+                title: "Figma",
+                category: "tools",
+                description: "Utilisation et fonctionnalités de l'outil de design Figma",
+                summary: "Guide complet sur Figma, un outil de design d'interface collaboratif basé sur le cloud. Cette veille couvre les fonctionnalités principales, les plugins utiles, les techniques avancées et le workflow de design-to-development avec Figma.",
+                url: "https://abb-gg.github.io/veille-figma/"
+            },
+            {
+                title: "React.js",
+                category: "frameworks",
+                description: "Exploration du framework JavaScript React pour le développement d'interfaces",
+                summary: "Cette veille explore React.js, une bibliothèque JavaScript pour construire des interfaces utilisateur. Elle couvre les concepts fondamentaux (composants, props, état), les hooks, la gestion d'état, le routage et les bonnes pratiques de développement avec React.",
+                url: "https://rebecca-tond-t.github.io/react1.js/"
+            },
+            {
+                title: "Progressive Web Apps",
+                category: "tech",
+                description: "Création et déploiement d'applications web progressives",
+                summary: "Cette veille examine les Progressive Web Apps (PWA), leurs caractéristiques, avantages et méthodes d'implémentation. Elle couvre les service workers, le manifeste web app, les stratégies de mise en cache et les meilleures pratiques pour créer des PWA performantes.",
+                url: "https://sarahakl.github.io/ProgressiveWebApp/"
+            },
+            {
+                title: "Composer",
+                category: "tools",
+                description: "Gestion des dépendances PHP avec Composer",
+                summary: "Guide détaillé sur Composer, le gestionnaire de dépendances pour PHP. Cette veille explique comment initialiser un projet, gérer les dépendances, créer et publier des packages, et intégrer Composer dans le workflow de développement PHP.",
+                url: "https://abb-gg.github.io/Compser/"
+            },
+            {
+                title: "Firebase",
+                category: "tools",
+                description: "Utilisation de la plateforme Firebase pour le développement d'applications",
+                summary: "Cette veille présente Firebase, la plateforme de développement d'applications de Google. Elle explore les différents services offerts (Firestore, Authentification, Hosting, etc.) et comment les intégrer pour créer rapidement des applications évolutives.",
+                url: "https://modestekra.github.io/Firebase/"
+            },
+            {
+                title: "Node.js & NPM",
+                category: "tools",
+                description: "Environnement d'exécution JavaScript côté serveur et gestionnaire de paquets",
+                summary: "Exploration approfondie de Node.js et NPM, couvrant l'architecture de Node.js, son modèle d'événements non-bloquant, la gestion de paquets avec NPM, et les bonnes pratiques pour développer des applications backend avec ces technologies.",
+                url: "https://nodejs-npm.onrender.com/"
+            },
+            {
+                title: "PHASER",
+                category: "libraries",
+                description: "Développement de jeux avec le framework Phaser",
+                summary: "Cette veille se concentre sur Phaser, un framework pour le développement de jeux HTML5. Elle couvre les concepts fondamentaux, la gestion des sprites, la physique, les animations, le son et les techniques pour créer des jeux 2D performants pour le web.",
+                url: "https://wawawil.github.io/PHASER/"
+            },
+            {
+                title: "Babylon.js",
+                category: "libraries",
+                description: "Création de graphiques 3D avec la bibliothèque Babylon.js",
+                summary: "Analyse de Babylon.js, un puissant moteur de rendu 3D JavaScript. Cette veille explore la création de scènes 3D, les matériaux, l'éclairage, les animations, la physique et l'intégration avec d'autres technologies web pour créer des expériences 3D immersives.",
+                url: "https://abb-gg.github.io/Babylon.js/"
+            },
+            {
+                title: "Vimeo",
+                category: "api",
+                description: "Intégration et utilisation de l'API Vimeo",
+                summary: "Cette veille examine l'API Vimeo et ses capacités pour intégrer la lecture vidéo, télécharger du contenu et gérer les vidéos programmatiquement. Elle inclut des exemples d'implémentation et des stratégies pour optimiser l'expérience vidéo sur le web.",
+                url: "https://rebecca-tond-t.github.io/veille_vimeo/"
+            },
+            {
+                title: "OpenStreetMap",
+                category: "api",
+                description: "Utilisation des données cartographiques d'OpenStreetMap",
+                summary: "Guide sur l'utilisation d'OpenStreetMap, ses API et bibliothèques associées pour intégrer des cartes interactives dans les applications web. Cette veille couvre l'extraction de données géographiques, la personnalisation des cartes et les cas d'utilisation pratiques.",
+                url: "https://openstreetmap-htov.onrender.com/"
+            },
+            {
+                title: "3D Markup Language",
+                category: "tech",
+                description: "Exploration du langage de balisage 3D pour le web",
+                summary: "Cette veille explore le 3D Markup Language et les technologies associées pour intégrer des contenus 3D sur le web. Elle couvre les fondamentaux de la 3D sur le web, les formats de fichiers, les performances et l'accessibilité des contenus 3D.",
+                url: "https://abb-gg.github.io/3DML/"
+            },
+            {
+                title: "Blazor",
+                category: "frameworks",
+                description: "Framework web pour la création d'applications interactives avec C# et .NET",
+                summary: "Analyse de Blazor, le framework web de Microsoft permettant de créer des applications web interactives avec C# au lieu de JavaScript. Cette veille explore les deux modèles d'hébergement (WebAssembly et Server), les composants, l'état, et l'écosystème .NET.",
+                url: "https://modestekra.github.io/veille_blazor/"
+            },
+            {
+                title: "Sites Freelancers",
+                category: "tools",
+                description: "Analyse des plateformes pour travailleurs indépendants",
+                summary: "Cette veille compare les différentes plateformes de freelance disponibles, leurs avantages, inconvénients, modèles de tarification et spécialisations. Elle fournit des conseils pour choisir la plateforme la plus adaptée selon le profil et les objectifs du freelancer.",
+                url: "https://sarahakl.github.io/SitesFreelancers/"
+            },
+            {
+                title: "DevMarket",
+                category: "tech",
+                description: "Étude du marché du développement informatique",
+                summary: "Analyse du marché du développement informatique, incluant les tendances d'emploi, les technologies en demande, les salaires, et l'évolution des compétences recherchées. Cette veille aide à comprendre le paysage actuel et futur du secteur du développement.",
+                url: "https://kyl226.github.io/DevMarket/"
+            },
+            {
+                title: "Veille Technologies Backend & Bases de Données",
+                category: "tech",
+                description: "Analyse des technologies backend et des systèmes de gestion de bases de données",
+                summary: "Cette veille explore les dernières tendances en matière de technologies backend (serveurs, architectures) et de systèmes de gestion de bases de données (relationnelles, NoSQL). Elle couvre les performances, la scalabilité et les cas d'utilisation spécifiques.",
+                url: "https://sarahakl.github.io/Veille_TechnologiesBackend_BasesDonn-es/"
+            },
+            {
+                title: "Veille Solutions Technologiques",
+                category: "tech",
+                description: "Comparaison des différentes solutions technologiques disponibles",
+                summary: "Une analyse comparative des solutions technologiques actuelles, couvrant leurs fonctionnalités, avantages, limites et domaines d'application. Cette veille aide à choisir la solution la plus adaptée selon les besoins spécifiques d'un projet.",
+                url: "https://estherbro123.github.io/Veille-solutions/"
+            },
+            {
+                title: "Veille sur Flippa",
+                category: "tools",
+                description: "Analyse de la plateforme Flippa pour l'achat et la vente de sites web",
+                summary: "Cette veille examine la plateforme Flippa, son fonctionnement, ses modèles économiques et son utilité pour les entrepreneurs web. Elle couvre les processus d'achat et de vente, les évaluations de sites, et les stratégies pour tirer le meilleur parti de cette plateforme.",
+                url: "https://flippa-7dff.onrender.com/"
+            }
+        ];
+
+        // Fonction pour obtenir le nom complet de la catégorie
+        function getCategoryName(category) {
+            const categories = {
+                'frontend': 'Frontend',
+                'libraries': 'Bibliothèques',
+                'frameworks': 'Frameworks',
+                'api': 'API',
+                'ai': 'Intelligence Artificielle',
+                'tools': 'Outils',
+                'tech': 'Technologies'
+            };
+            return categories[category] || category;
+        }
+
+        // Fonction pour générer les sections par catégorie
+        function generateCategorySections(veillesArray) {
+            const container = document.getElementById('veilles-container');
+            container.innerHTML = '';
+
+            if (veillesArray.length === 0) {
+                container.innerHTML = '<p style="text-align: center; padding: 20px;">Aucune veille ne correspond à votre recherche.</p>';
+                return;
+            }
+
+            // Regrouper les veilles par catégorie
+            const veillesByCategory = {};
+            veillesArray.forEach(veille => {
+                if (!veillesByCategory[veille.category]) {
+                    veillesByCategory[veille.category] = [];
+                }
+                veillesByCategory[veille.category].push(veille);
+            });
+
+            // Créer une section pour chaque catégorie
+            Object.keys(veillesByCategory).sort().forEach(category => {
+                const categoryVeilles = veillesByCategory[category];
+                
+                // Créer la section de catégorie
+                const categorySection = document.createElement('div');
+                categorySection.className = 'category-section';
+                
+                // En-tête de la catégorie
+                const categoryHeader = document.createElement('div');
+                categoryHeader.className = 'category-header';
+                
+                const categoryTitle = document.createElement('h2');
+                categoryTitle.className = 'category-title';
+                categoryTitle.textContent = getCategoryName(category);
+                
+                const categoryCount = document.createElement('span');
+                categoryCount.className = 'category-count';
+                categoryCount.textContent = `${categoryVeilles.length} veille(s)`;
+                
+                categoryHeader.appendChild(categoryTitle);
+                categoryHeader.appendChild(categoryCount);
+                categorySection.appendChild(categoryHeader);
+                
+                // Grille de veilles pour cette catégorie
+                const veillesGrid = document.createElement('div');
+                veillesGrid.className = 'veilles-grid';
+                
+                // Ajouter chaque veille à la grille
+                categoryVeilles.forEach(veille => {
+                    const card = createVeilleCard(veille);
+                    veillesGrid.appendChild(card);
+                });
+                
+                categorySection.appendChild(veillesGrid);
+                container.appendChild(categorySection);
+            });
+        }
+
+        // Fonction pour créer une carte de veille
+        function createVeilleCard(veille) {
+            const card = document.createElement('div');
+            card.className = 'veille-card';
+            
+            const cardContent = document.createElement('div');
+            cardContent.className = 'card-content';
+            
+            const title = document.createElement('h3');
+            title.className = 'veille-title';
+            title.textContent = veille.title;
+            
+            const description = document.createElement('p');
+            description.className = 'veille-description';
+            description.textContent = veille.description;
+            
+            const summary = document.createElement('div');
+            summary.className = 'veille-summary';
+            summary.textContent = veille.summary;
+            
+            const link = document.createElement('a');
+            link.className = 'veille-link';
+            link.href = veille.url;
+            link.textContent = 'Voir la veille';
+            link.target = '_blank';
+            
+            cardContent.appendChild(title);
+            cardContent.appendChild(description);
+            cardContent.appendChild(summary);
+            cardContent.appendChild(link);
+            card.appendChild(cardContent);
+            
+            return card;
+        }
+
+        // Fonction pour filtrer par catégorie
+        function filterCategory(category) {
+            const buttons = document.querySelectorAll('.category-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            let filteredVeilles;
+            if (category === 'all') {
+                filteredVeilles = veilles;
+            } else {
+                filteredVeilles = veilles.filter(veille => veille.category === category);
+            }
+            
+            generateCategorySections(filteredVeilles);
+        }
+
+        // Fonction pour filtrer par recherche
+        function filterVeilles() {
+            const searchTerm = document.getElementById('search').value.toLowerCase();
+            let filteredVeilles;
+            
+            if (searchTerm === '') {
+                const activeCategory = document.querySelector('.category-btn.active').textContent.toLowerCase();
+                if (activeCategory === 'tous') {
+                    filteredVeilles = veilles;
+                } else {
+                    const categoryKey = Object.keys(getCategoryMapping()).find(key => 
+                        getCategoryName(key).toLowerCase() === activeCategory
+                    ) || activeCategory;
+                    filteredVeilles = veilles.filter(veille => veille.category === categoryKey);
+                }
+            } else {
+                filteredVeilles = veilles.filter(veille => 
+                    veille.title.toLowerCase().includes(searchTerm) ||
+                    veille.description.toLowerCase().includes(searchTerm) ||
+                    veille.summary.toLowerCase().includes(searchTerm) ||
+                    getCategoryName(veille.category).toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            generateCategorySections(filteredVeilles);
+        }
+
+        // Mapping des catégories pour la recherche
+        function getCategoryMapping() {
+            return {
+                'frontend': 'Frontend',
+                'libraries': 'Bibliothèques',
+                'frameworks': 'Frameworks',
+                'api': 'API',
+                'ai': 'Intelligence Artificielle',
+                'tools': 'Outils',
+                'tech': 'Technologies'
+            };
+        }
+
+        // Initialiser la page
+        document.addEventListener('DOMContentLoaded', () => {
+            generateCategorySections(veilles);
+        });
+    </script>
+</body>
+</html>
